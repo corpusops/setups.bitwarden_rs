@@ -1,0 +1,145 @@
+---
+bitwarden_volumes_hostdir: /srv/docker/bitwarden
+bitwarden_volumes:
+- "{{bitwarden_volumes_hostdir}}"
+bitwarden_image: "vaultwarden/server:1.21.0"
+bitwarden_network: 172.34.0
+bitwarden_domain: bitwarden.foo.net
+bitwarden_db_password: xxxtR0xN0eQ9oP1tQ2w
+bitwarden_ldap_dn: "cn=bitwardenreader,ou=People,dc=foo,dc=org"
+bitwarden_ldap_pw: "xxx"
+bitwarden_ldap_host: "ldap.foo.net"
+bitwarden_ldap_bdn: "dc=foo,dc=org"
+bitwarden_ldap_mailattr: "shortMail"
+#
+bitwarden_pg: "13"
+bitwarden_db_image: corpusops/postgres:{{bitwarden_pg}}
+bitwarden_backup_image: corpusops/dbsmartbackup:postgres-{{bitwarden_pg}}
+bitwarden_xforwarded: true
+bitwarden_compose_project: "{{bitwarden_volumes_hostdir|copsf_basename}}"
+bitwarden_ip: 127.0.0.1
+bitwarden_public_http_port: 80
+bitwarden_public_https_port: 443
+bitwarden_http_port: 8080
+bitwarden_dbs_compression: nocomp
+bitwarden_hosts: ["{{bitwarden_domain}}"]
+bitwarden_app_service_config_files: []
+bitwarden_db_name: db
+bitwarden_db_host: db
+bitwarden_db_port: 5432
+bitwarden_db_user: dbuser
+bitwarden_riot_theme:  dark
+bitwarden_docker_dot_env: |-
+  # ansible managed
+  NGINX_REAL_IP_FROM={{bitwarden_real_ip_from}}
+  COMPOSE_PROJECT_NAME={{bitwarden_compose_project}}
+  DATA_FOLDER=/data
+  DATABASE_URL=postgresql://{{bitwarden_db_user}}:{{bitwarden_db_password}}@{{bitwarden_db_host}}:{{bitwarden_db_port}}/{{bitwarden_db_name}}
+  POSTGRES_USER={{bitwarden_db_user}}
+  POSTGRES_PASSWORD={{bitwarden_db_password}}
+  POSTGRES_HOST={{bitwarden_db_host}}
+  POSTGRES_PORT={{bitwarden_db_port}}
+  POSTGRES_DB={{bitwarden_db_name}}
+  PGPASSWD={{bitwarden_db_password}}
+  PGPASSWORD={{bitwarden_db_password}}
+  F2B_LOG_LEVEL={{bitwarden_f2b_loglevel}}
+  INVITATION_ORG_NAME={{bitwarden_invitation_org_name}}
+  ORG_CREATION_USERS={{bitwarden_org_creation_users}}
+  BITWARDEN_DOMAIN={{bitwarden_domain}}
+  BITWARDEN_LISTEN_IF={{bitwarden_listen_if}}
+  BITWARDEN_LISTEN_INT_IF={{bitwarden_listen_int_if}}
+  BITWARDEN_PUBLIC_HTTP_PORT={{bitwarden_public_http_port}}
+  BITWARDEN_HTTP_PORT={{bitwarden_http_port}}
+  BITWARDEN_PUBLIC_HTTPS_PORT={{bitwarden_public_https_port}}
+  BITWARDEN_DB_NAME={{bitwarden_db_name}}
+  BITWARDEN_DBS_COMPRESSION={{bitwarden_dbs_compression}}
+  BITWARDEN_KEEP_DUMPS={{bitwarden_keep_dumps}}
+  BITWARDEN_NETWORK={{bitwarden_network}}
+  BITWARDEN_IMAGE={{bitwarden_image}}
+  BITWARDEN_BACKUP_IMAGE={{bitwarden_backup_image}}
+  BITWARDEN_DB_IMAGE={{bitwarden_db_image}}
+  BITWARDEN_RESTART_POLICY={{bitwarden_restart_policy}}
+  LOG_FILE={{bitwarden_log_file}}
+  LOG_LEVEL={{bitwarden_log_level}}
+  WEBSOCKET_ENABLED={{bitwarden_websocket_enabled}}
+  SIGNUPS_ALLOWED={{bitwarden_raw_signups_allowed}}
+  DISABLE_ADMIN_TOKEN={{bitwarden_disable_admin_token}}
+  {% if bitwarden_smtp_host %}
+  SMTP_FROM={{bitwarden_smtp_from}}
+  SMTP_FROM_NAME={{bitwarden_smtp_from_name}}
+  SMTP_TIMEOUT={{bitwarden_smtp_timeout}}
+  {% if bitwarden_smtp_host == 'mailcatcher' %}
+  SMTP_HOST=mailcatcher
+  SMTP_PORT=1025
+  SMTP_EXPLICIT_TLS=false
+  SMTP_SSL=false
+  {% else %}
+  SMTP_HOST={{bitwarden_smtp_host}}
+  SMTP_PORT={{bitwarden_smtp_port}}
+  SMTP_SSL={{bitwarden_smtp_ssl}}
+  SMTP_EXPLICIT_TLS={{bitwarden_smtp_explicit_tls}}
+  SMTP_USERNAME={{bitwarden_smtp_username}}
+  SMTP_PASSWORD={{bitwarden_smtp_password}}
+  {% endif %}
+  {% endif %}
+  SMTP_TIMEOUT={{bitwarden_smtp_timeout}}
+  {% if bitwarden_admin_token %}
+  ADMIN_TOKEN={{bitwarden_admin_token}}
+  {% endif %}
+  DOMAIN={{bitwarden_sheme}}://{{bitwarden_domain}}
+  {% if bitwarden_signups_domains_whitelist %}
+  SIGNUPS_DOMAINS_WHITELIST={{bitwarden_signups_domains_whitelist}}
+  {% endif %}
+  PASSWORD_ITERATIONS={{bitwarden_password_iterations}}
+  {% if bitwarden_signups_verify %}
+  SIGNUPS_VERIFY={{bitwarden_signups_verify}}
+  {% endif %}
+  MAILCATCHER_USER={{bitwarden_mailcatcher_user}}
+  MAILCATCHER_PASSWORD={{bitwarden_mailcatcher_password}}
+# https://github.com/bitwarden/jslib/issues/52
+# https://github.com/dani-garcia/bitwarden_rs/issues/1166
+# cannot be set higher globally, only by users by their vault settings, but we should in the future.
+# https://github.com/bitwarden/jslib/issues/52
+bitwarden_signups_verify: "false"
+bitwarden_password_iterations: "2000000"
+bitwarden_signups_domains_whitelist: ""
+bitwarden_sheme: https
+bitwarden_default_is: [bitwarden.org, vector.im]
+bitwarden_real_ip_from: "10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 {{bitwarden_network}}.0/12"
+bitwarden_keep_dumps: "1"
+bitwarden_restart_policy: unless-stopped
+bitwarden_listen_if: 0.0.0.0
+bitwarden_listen_int_if: 127.0.0.1
+bitwarden_dcompose: docker-compose -p {{bitwarden_compose_project}} -f docker-compose.yml
+bitwarden_traefik_extra: ""
+bitwarden_started_state: started
+bitwarden_stdout: /dev/null
+bitwarden_stderr: /dev/null
+bitwarden_websocket_enabled: "true"
+bitwarden_raw_signups_allowed: "true"
+bitwarden_signups_allowed: True
+bitwarden_smtp_from: ""
+bitwarden_smtp_from_name: bitwarden
+bitwarden_smtp_host: ""
+bitwarden_smtp_port: 465
+bitwarden_smtp_ssl: "true"
+bitwarden_smtp_explicit_tls: "true"
+bitwarden_smtp_username: ""
+bitwarden_smtp_password: ""
+bitwarden_smtp_timeout: 15
+# random 40char+ string
+bitwarden_admin_token: ""
+bitwarden_log_file: /logs/bitwarden.log
+bitwarden_log_level: info
+bitwarden_fail2ban_retries: 10
+bitwarden_fail2ban_bantime: 14400
+bitwarden_f2b_loglevel: INFO
+bitwarden_invitation_org_name: "{{bitwarden_domain}} bitwarden"
+bitwarden_allow_admin_api_ips: []
+bitwarden_mailcatcher_user: mailcatcher
+bitwarden_disable_admin_token: "true"
+bitwarden_mailcatcher_password: secretlV6fU0gP6rI7aP2m
+# 0 deny, 1 allow
+# bitwarden_allow_admin_api_ips: [x.x.x.x 1]
+
+bitwarden_org_creation_users: ""

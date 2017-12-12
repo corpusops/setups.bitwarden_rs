@@ -1,0 +1,14 @@
+- include_role:
+    name: corpusops.roles/docker_compose_service
+  vars:
+    _docker_compose_service:
+      project: "{{bitwarden_compose_project}}"
+      state: "{{bitwarden_started_state}}"
+      working_directory: "{{bitwarden_volumes_hostdir}}"
+      stdout: "{{bitwarden_stdout}}"
+      stderr: "{{bitwarden_stderr}}"
+- shell: |-
+    set -ex
+    cd "{{bitwarden_volumes_hostdir}}"
+    docker-compose -p {{bitwarden_compose_project}} up -d
+  tags: [bitwarden_restart_services]

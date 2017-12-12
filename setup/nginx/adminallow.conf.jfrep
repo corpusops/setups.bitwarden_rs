@@ -1,0 +1,4 @@
+{{'{{'}}.Env.BITWARDEN_NETWORK}}.0/24 1;
+{% for i in bitwarden_allow_admin_api_ips %}
+{{i}};
+{% endfor %}

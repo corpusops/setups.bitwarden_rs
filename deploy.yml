@@ -1,0 +1,4 @@
+---
+- hosts: "{{bitwarden_servers|default('bitwarden_servers')}}"
+  roles:
+  - {name: bitwarden_setup, tags: [setup]}
