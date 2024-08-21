@@ -2,7 +2,7 @@
 bitwarden_volumes_hostdir: /srv/docker/bitwarden
 bitwarden_volumes:
 - "{{bitwarden_volumes_hostdir}}"
-bitwarden_image: "vaultwarden/server:1.24.0"
+bitwarden_image: "vaultwarden/server:1.27.0"
 bitwarden_network: 172.34.0
 bitwarden_domain: bitwarden.foo.net
 bitwarden_db_password: xxxtR0xN0eQ9oP1tQ2w
